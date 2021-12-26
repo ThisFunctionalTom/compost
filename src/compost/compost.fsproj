@@ -9,8 +9,8 @@
     <Compile Include="compost.fs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Fable.Browser.Dom" Version="1.1.0" />
-    <PackageReference Include="Fable.Core" Version="3.1.5" />
+    <PackageReference Include="Fable.Browser.Dom" Version="2.8.0" />
+    <PackageReference Include="Fable.Core" Version="3.6.1" />
   </ItemGroup>
   <!-- Add source files to "fable" folder in Nuget package -->
   <ItemGroup>
