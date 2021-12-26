@@ -7,6 +7,18 @@
       "commands": [
         "fable"
       ]
+    },
+    "fantomas-tool": {
+      "version": "4.6.0-alpha-004",
+      "commands": [
+        "fantomas"
+      ]
+    },
+    "femto": {
+      "version": "0.12.0",
+      "commands": [
+        "femto"
+      ]
     }
   }
 }

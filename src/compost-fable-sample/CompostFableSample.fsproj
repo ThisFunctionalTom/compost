@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="CompostFableSample.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Compost.Fable" Version="1.0.0" />
+    <PackageReference Include="Feliz" Version="1.57.0" />
+  </ItemGroup>
+
+</Project>
