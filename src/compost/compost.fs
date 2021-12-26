@@ -21,37 +21,36 @@ module Helpers =
 
 open Helpers
 
-type Scale = Scale<1>
-type Shape = Shape<1, 1>
-
 type JsScale = 
-  abstract continuous : float * float -> Scale
-  abstract categorical : string[] -> Scale
+  abstract continuous : float * float -> Scale<1>
+  abstract categorical : string[] -> Scale<1>
 
 type JsCompost =
-  abstract nestX : obj * obj * Shape -> Shape
-  abstract nestY : obj * obj * Shape -> Shape
-  abstract nest : obj * obj * obj * obj * Shape -> Shape
-  abstract scaleX : Scale * Shape -> Shape
-  abstract scaleY : Scale * Shape -> Shape
-  abstract scale : Scale * Scale * Shape -> Shape
-  abstract overlay : Shape[] -> Shape
-  abstract fillColor : string * Shape -> Shape
-  abstract strokeColor : string * Shape -> Shape
-  abstract font : string * string * Shape -> Shape
-  abstract padding : float * float * float * float * Shape -> Shape
-  abstract text : obj * obj * string * string * float -> Shape
-  abstract column : string * float -> Shape
-  abstract bar : float * string -> Shape
-  abstract bubble : obj * obj * float * float -> Shape
-  abstract shape : obj[][] -> Shape
-  abstract line : obj[][] -> Shape
-  abstract on : obj * Shape -> Shape
-  abstract axes : string * Shape -> Shape
-  abstract render : string * Shape -> unit
-  abstract svg : float * float * Shape -> DomNode
+  abstract nestX : obj * obj * Shape<1, 1> -> Shape<1, 1>
+  abstract nestY : obj * obj * Shape<1, 1> -> Shape<1, 1>
+  abstract nest : obj * obj * obj * obj * Shape<1, 1> -> Shape<1, 1>
+  abstract scaleX : Scale<1> * Shape<1, 1> -> Shape<1, 1>
+  abstract scaleY : Scale<1> * Shape<1, 1> -> Shape<1, 1>
+  abstract scale : Scale<1> * Scale<1> * Shape<1, 1> -> Shape<1, 1>
+  abstract overlay : Shape<1, 1>[] -> Shape<1, 1>
+  abstract fillColor : string * Shape<1, 1> -> Shape<1, 1>
+  abstract strokeColor : string * Shape<1, 1> -> Shape<1, 1>
+  abstract font : string * string * Shape<1, 1> -> Shape<1, 1>
+  abstract padding : float * float * float * float * Shape<1, 1> -> Shape<1, 1>
+  abstract text : obj * obj * string * string * float -> Shape<1, 1>
+  abstract column : string * float -> Shape<1, 1>
+  abstract bar : float * string -> Shape<1, 1>
+  abstract bubble : obj * obj * float * float -> Shape<1, 1>
+  abstract shape : obj[][] -> Shape<1, 1>
+  abstract line : obj[][] -> Shape<1, 1>
+  abstract on : obj * Shape<1, 1> -> Shape<1, 1>
+  abstract axes : string * Shape<1, 1> -> Shape<1, 1>
+  abstract render : string * Shape<1, 1> -> unit
+  abstract svg : float * float * Shape<1, 1> -> DomNode
   abstract html : string * obj * DomNode[] -> DomNode
-  abstract interactive<'e, 's> : string * 's * ('s -> 'e -> 's) * (('e -> unit) -> 's -> Shape) -> unit
+  abstract interactive<'e, 's> : string * 's * ('s -> 'e -> 's) * (('e -> unit) -> 's -> Shape<1, 1>) -> unit
+
+let x : Scale<1> = Continuous(CO 1., CO 2.)
 
 let scale = 
   { new JsScale with 
