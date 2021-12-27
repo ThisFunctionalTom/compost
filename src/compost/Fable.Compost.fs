@@ -17,10 +17,21 @@ let formatValue v =
     | COV (CO v) -> box v
 
 type ToValue =
-    static member inline ToValue(x: float, [<Optional>] _impl: ToValue) = COV(CO x)
-    static member inline ToValue(x: int, [<Optional>] _impl: ToValue) = COV(CO(float x))
-    static member inline ToValue((c: string, r: float), [<Optional>] _impl: ToValue) = CAR(CA c, r)
-    static member inline ToValue((c: string, r: int), [<Optional>] _impl: ToValue) = CAR(CA c, float r)
+    static member inline ToValue(x: float, [<Optional>] _impl: ToValue) =
+        printfn $"{x}({x.GetType()}) -> COV(CO {x})"
+        COV(CO x)
+
+    static member inline ToValue(x: int, [<Optional>] _impl: ToValue) =
+        printfn $"{x}({x.GetType()}) -> COV(CO (float {x}))"
+        COV(CO(float x))
+
+    static member inline ToValue((c: string, r: float), [<Optional>] _impl: ToValue) =
+        printfn $"{c}, {r} -> CAR(CA {c}, {r})"
+        CAR(CA c, r)
+
+    static member inline ToValue((c: string, r: int), [<Optional>] _impl: ToValue) =
+        printfn $"{c}, {r} -> CAR(CA {c}, float {r})"
+        CAR(CA c, float r)
 
     static member inline Invoke value : Value<1> =
         let inline call_2 (a: ^a, b: ^b) =
@@ -35,15 +46,19 @@ type CatValue = string * float
 
 type ToValues =
     static member inline ToValues(a: seq<float * float>, [<Optional>] _impl: ToValues) =
+        printfn $"ToValues: {a} (float*float)"
         [ for x, y in a -> !!x, !!y ]
 
     static member inline ToValues(a: seq<float * CatValue>, [<Optional>] _impl: ToValues) =
+        printfn $"ToValues: {a} (float*CatValue)"
         [ for x, y in a -> !!x, !!y ]
 
     static member inline ToValues(a: seq<CatValue * float>, [<Optional>] _impl: ToValues) =
+        printfn $"ToValues: {a} (CatValue*float)"
         [ for x, y in a -> !!x, !!y ]
 
     static member inline ToValues(a: seq<CatValue * CatValue>, [<Optional>] _impl: ToValues) =
+        printfn $"ToValues: {a} (CatValue*CatValue)"
         [ for x, y in a -> !!x, !!y ]
 
     static member inline Invoke value : (Value<_> * Value<_>) list =
@@ -76,10 +91,7 @@ type Compost =
 
     static member inline bubble(xp, yp, w, h) = Shape.Bubble(!!xp, !!yp, w, h)
 
-    static member inline text(xp, yp, t, s, r) =
-        let r = if box r = null then 0.0 else r
-        let s = if box s = null then "" else s
-
+    static member inline text(xp: Value<1>, yp: Value<1>, t: string, s: string, r: float) =
         let va =
             if s.Contains("baseline") then Baseline
             elif s.Contains("hanging") then Hanging
@@ -90,11 +102,22 @@ type Compost =
             elif s.Contains("end") then End
             else Center
 
-        Shape.Text(!!xp, !!yp, va, ha, r, t)
+        Shape.Text(xp, yp, va, ha, r, t)
 
-    static member inline shape(a) = Shape.Shape (ToValues.Invoke a)
+    static member inline text(xp: float, yp: float, t, ?s, ?r) =
+        Compost.text (!!xp, !!yp, t, defaultArg s "", defaultArg r 0.0)
 
-    static member inline line(a) = Shape.Line (ToValues.Invoke a)
+    static member inline text(xp: CatValue, yp: float, t, ?s, ?r) =
+        Compost.text (!!xp, !!yp, t, defaultArg s "", defaultArg r 0.0)
+
+    static member inline text(xp: float, yp: CatValue, t, ?s, ?r) =
+        Compost.text (!!xp, !!yp, t, defaultArg s "", defaultArg r 0.0)
+
+    static member inline text(xp: CatValue, yp: CatValue, t, ?s, ?r) =
+        Compost.text (!!xp, !!yp, t, defaultArg s "", defaultArg r 0.0)
+
+    static member inline shape(a) = Shape.Shape(ToValues.Invoke a)
+    static member inline line(a) = Shape.Line(ToValues.Invoke a)
 
     static member inline axes(a: Side list, s) =
         Shape.Axes(List.contains Top a, List.contains Right a, List.contains Bottom a, List.contains Left a, s)

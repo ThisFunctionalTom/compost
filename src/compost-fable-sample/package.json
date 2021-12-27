@@ -1,10 +1,9 @@
 {
-  "name": "vite-project",
-  "version": "0.0.0",
+  "name": "compostjs",
+  "version": "0.0.5",
   "scripts": {
-    "dev": "dotnet fable watch -s . --run vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "dev": "dotnet fable watch . -s -o dist --run vite",
+    "build": "dotnet fable . -o dist --run vite build"
   },
   "devDependencies": {
     "vite": "^2.7.2"
