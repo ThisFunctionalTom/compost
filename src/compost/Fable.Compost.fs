@@ -1,7 +1,8 @@
-module Compost.Fable
+module Fable.Compost
 
 open Browser
 open System.Runtime.InteropServices
+open Compost
 open Compost.Html
 
 [<Struct>]
@@ -58,6 +59,10 @@ type ToValues =
         call (Unchecked.defaultof<ToValues>, value)
 
 let inline (!!!) x = ToValues.Invoke x
+
+type Scale =
+    static member continuous(lo, hi) = Continuous(CO lo, CO hi) 
+    static member categorical(cats) = Categorical [| for c in cats -> CA c |]
 
 type Compost =
     static member inline scaleX(sc, sh) = Shape.InnerScale(Some(sc), None, sh)

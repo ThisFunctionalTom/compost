@@ -4,24 +4,21 @@ open Compost
 
 open Feliz
 
-open Compost.Fable
+open Fable.Compost
 
-type c = Compost.Fable.Compost
+type c = Fable.Compost.Compost
+type s = Fable.Compost.Scale
 
-type Data = 
-    {
-        Label: string
-        Value: int
-        StdDev: int
-        Color: string
-    }
+type Data =
+    { Label: string
+      Value: int
+      StdDev: int
+      Color: string }
     static member Create(label, value, stddev, color) =
-        {
-            Label = label
-            Value = value
-            StdDev = stddev
-            Color = color
-        }
+        { Label = label
+          Value = value
+          StdDev = stddev
+          Color = color }
 
 
 let data =
@@ -41,28 +38,28 @@ let errorLine (x: string, y: float, sdv: float) =
                              (x, 0.55), (y + sdv) ] ]
     )
 
-let colors : Shape<1, 1> list =
+let colors: Shape<1, 1> list =
     data
     |> List.map (fun d -> c.fillColor (d.Color, c.padding (7, 0, 7, 0, c.bar (10, d.Label))))
 
-let labels : Shape<1, 1> list =
+let labels: Shape<1, 1> list =
     data
-    |> List.map (fun d -> 
-        c.text (12, (d.Label, 0.5), d.Label, "start"))
+    |> List.map (fun d -> c.text (12, (d.Label, 0.5), d.Label, "start"))
 
 let legend =
-    c.overlay [ 
-        for color in colors do
-            color
-        c.font ("11pt arial", "black", c.overlay(labels)) 
-    ]
+    c.overlay [ for color in colors do
+                    color
+                c.font ("11pt arial", "black", c.overlay (labels)) ]
 
 let chart =
     c.axes (
         [ Left; Bottom ],
-        c.overlay [ for d in data do
-                        c.fillColor (d.Color, c.column (d.Label, d.Value))
-                        errorLine (d.Label, d.Value, d.StdDev) ]
+        c.scaleY (
+            s.continuous (0., 100.),
+            c.overlay [ for d in data do
+                            c.fillColor (d.Color, c.column (d.Label, d.Value))
+                            errorLine (d.Label, d.Value, d.StdDev) ]
+        )
     )
 
 let demo =
