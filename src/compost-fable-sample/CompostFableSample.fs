@@ -33,12 +33,12 @@ let data =
 let errorLine (x: string, y: float, sdv: float) =
     c.strokeColor (
         "black",
-        c.overlay [ c.line [ ((x, 0.5), y - sdv)
-                             ((x, 0.5), y + sdv) ]
-                    c.line [ ((x, 0.45), y - sdv)
-                             ((x, 0.55), y - sdv) ]
-                    c.line [ ((x, 0.45), y + sdv)
-                             ((x, 0.55), y + sdv) ] ]
+        c.overlay [ c.line [ (x, 0.5), (y - sdv)
+                             (x, 0.5), (y + sdv) ]
+                    c.line [ (x, 0.45), (y - sdv)
+                             (x, 0.55), (y - sdv) ]
+                    c.line [ (x, 0.45), (y + sdv)
+                             (x, 0.55), (y + sdv) ] ]
     )
 
 let colors : Shape<1, 1> list =

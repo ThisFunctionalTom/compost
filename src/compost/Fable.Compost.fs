@@ -17,21 +17,10 @@ let formatValue v =
     | COV (CO v) -> box v
 
 type ToValue =
-    static member inline ToValue(x: float, [<Optional>] _impl: ToValue) =
-        printfn $"{x}({x.GetType()}) -> COV(CO {x})"
-        COV(CO x)
-
-    static member inline ToValue(x: int, [<Optional>] _impl: ToValue) =
-        printfn $"{x}({x.GetType()}) -> COV(CO (float {x}))"
-        COV(CO(float x))
-
-    static member inline ToValue((c: string, r: float), [<Optional>] _impl: ToValue) =
-        printfn $"{c}, {r} -> CAR(CA {c}, {r})"
-        CAR(CA c, r)
-
-    static member inline ToValue((c: string, r: int), [<Optional>] _impl: ToValue) =
-        printfn $"{c}, {r} -> CAR(CA {c}, float {r})"
-        CAR(CA c, float r)
+    static member inline ToValue(x: float, [<Optional>] _impl: ToValue) = COV(CO x)
+    static member inline ToValue(x: int, [<Optional>] _impl: ToValue) = COV(CO(float x))
+    static member inline ToValue((c: string, r: float), [<Optional>] _impl: ToValue) = CAR(CA c, r)
+    static member inline ToValue((c: string, r: int), [<Optional>] _impl: ToValue) = CAR(CA c, float r)
 
     static member inline Invoke value : Value<1> =
         let inline call_2 (a: ^a, b: ^b) =
@@ -68,6 +57,8 @@ type ToValues =
         let inline call (a: 'a, b: 'b) = call_2 (a, b)
         call (Unchecked.defaultof<ToValues>, value)
 
+let inline (!!!) x = ToValues.Invoke x
+
 type Compost =
     static member inline scaleX(sc, sh) = Shape.InnerScale(Some(sc), None, sh)
     static member inline scaleY(sc, sh) = Shape.InnerScale(None, Some(sc), sh)
@@ -75,10 +66,12 @@ type Compost =
     static member inline scale(sx, sy, sh) =
         Shape.InnerScale(Some(sx), Some(sy), sh)
 
-    static member inline nestX(lx, hx, s) = Shape.NestX(!!lx, !!hx, s)
-    static member inline nestY(ly, hy, s) = Shape.NestY(!!ly, !!hy, s)
+    static member inline nestX(lx, hx, s) = Shape.NestX(lx, hx, s)
+    static member inline nestY(ly, hy, s) = Shape.NestY(ly, hy, s)
 
     static member inline nest(lx, hx, ly, hy, s) =
+        Shape.NestY(ly, hy, Shape.NestX(lx, hx, s))
+    static member inline nest(lx: float, hx: float, ly: float, hy: float, s) =
         Shape.NestY(!!ly, !!hy, Shape.NestX(!!lx, !!hx, s))
 
     static member inline overlay(sh) = Shape.Layered(sh)
@@ -89,7 +82,7 @@ type Compost =
     static member inline column(xp, yp) = Derived.Column(CA xp, CO yp)
     static member inline bar(xp, yp) = Derived.Bar(CO xp, CA yp)
 
-    static member inline bubble(xp, yp, w, h) = Shape.Bubble(!!xp, !!yp, w, h)
+    static member inline bubble(xp, yp, w, h) = Shape.Bubble(xp, yp, w, h)
 
     static member inline text(xp: Value<1>, yp: Value<1>, t: string, s: string, r: float) =
         let va =
@@ -103,21 +96,25 @@ type Compost =
             else Center
 
         Shape.Text(xp, yp, va, ha, r, t)
-
     static member inline text(xp: float, yp: float, t, ?s, ?r) =
-        Compost.text (!!xp, !!yp, t, defaultArg s "", defaultArg r 0.0)
-
-    static member inline text(xp: CatValue, yp: float, t, ?s, ?r) =
-        Compost.text (!!xp, !!yp, t, defaultArg s "", defaultArg r 0.0)
-
+        Compost.text(!!xp, !!yp, t, defaultArg s "", defaultArg r 0.0)
     static member inline text(xp: float, yp: CatValue, t, ?s, ?r) =
-        Compost.text (!!xp, !!yp, t, defaultArg s "", defaultArg r 0.0)
-
+        Compost.text(!!xp, !!yp, t, defaultArg s "", defaultArg r 0.0)
+    static member inline text(xp: CatValue, yp: float, t, ?s, ?r) =
+        Compost.text(!!xp, !!yp, t, defaultArg s "", defaultArg r 0.0)
     static member inline text(xp: CatValue, yp: CatValue, t, ?s, ?r) =
-        Compost.text (!!xp, !!yp, t, defaultArg s "", defaultArg r 0.0)
+        Compost.text(!!xp, !!yp, t, defaultArg s "", defaultArg r 0.0)
 
-    static member inline shape(a) = Shape.Shape(ToValues.Invoke a)
-    static member inline line(a) = Shape.Line(ToValues.Invoke a)
+    static member inline shape(a) = Shape.Shape(a)
+    static member inline shape(a: seq<float*float>) = Shape.Shape(!!!a)
+    static member inline shape(a: seq<float*CatValue>) = Shape.Shape(!!!a)
+    static member inline shape(a: seq<CatValue*float>) = Shape.Shape(!!!a)
+    static member inline shape(a: seq<CatValue*CatValue>) = Shape.Shape(!!!a)
+    static member inline line(a) = Shape.Line(a)
+    static member inline line(a: seq<float*float>) = Shape.Line(!!!a)
+    static member inline line(a: seq<float*CatValue>) = Shape.Line(!!!a)
+    static member inline line(a: seq<CatValue*CatValue>) = Shape.Line(!!!a)
+    static member inline line(a: seq<CatValue*float>) = Shape.Line(!!!a)
 
     static member inline axes(a: Side list, s) =
         Shape.Axes(List.contains Top a, List.contains Right a, List.contains Bottom a, List.contains Left a, s)
